@@ -17,7 +17,7 @@ def write_table_to_workbook(table, workbook,
     if not isinstance(table, Table):
         raise TypeError(
             'table must be an instance of {0.__module__}.{0.__name__} or its '
-            'subclass, not {1!r}'.format(Table, worksheet)
+            'subclass, not {1!r}'.format(Table, table)
         )
     elif not isinstance(workbook, Workbook):
         raise TypeError('workbook must be an instance of {0.__module__}.'

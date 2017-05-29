@@ -26,6 +26,10 @@ To be released.
   - ``dodotable_xlsx.write_table_to_worksheet()`` function became to have
     a required parameter ``date_format``.
 
+- Fixed a bug that ``dodotable_xlsx.write_table_to_workbook()`` function had
+  raised ``NameError`` when the given ``table`` is an instance of an invalid
+  type.
+
 
 Version 0.1.0
 ~~~~~~~~~~~~~
