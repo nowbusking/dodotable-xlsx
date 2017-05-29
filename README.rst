@@ -13,6 +13,12 @@ Excel (.xlsx) exporter for dodotable_.
 Changelog
 ---------
 
+Version 0.2.1
+~~~~~~~~~~~~~
+
+To be released.
+
+
 Version 0.2.0
 ~~~~~~~~~~~~~
 
