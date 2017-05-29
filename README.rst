@@ -16,7 +16,7 @@ Changelog
 Version 0.2.0
 ~~~~~~~~~~~~~
 
-To be released.
+Released on May 29, 2017.
 
 - ``datetime.date`` values became properly formatted to ``yyyy-mm-dd``.
 
