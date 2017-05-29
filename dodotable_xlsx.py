@@ -11,7 +11,9 @@ __version__ = '0.2.0'
 __all__ = 'write_table_to_workbook', 'write_table_to_worksheet'
 
 
-def write_table_to_workbook(table, workbook, header_format=None):
+def write_table_to_workbook(table, workbook,
+                            header_format=None,
+                            date_format=None):
     if not isinstance(table, Table):
         raise TypeError(
             'table must be an instance of {0.__module__}.{0.__name__} or its '
@@ -27,10 +29,16 @@ def write_table_to_workbook(table, workbook, header_format=None):
             'bg_color': 'black',
             'fg_color': 'white',
         })
-    write_table_to_worksheet(table, worksheet, header_format)
+    if date_format is None:
+        date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+    write_table_to_worksheet(table, worksheet,
+                             header_format=header_format,
+                             date_format=date_format)
 
 
-def write_table_to_worksheet(table, worksheet, header_format):
+def write_table_to_worksheet(table, worksheet,
+                             header_format,
+                             date_format):
     logger = logging.getLogger(__name__ + '.write_table_to_worksheet')
     if not isinstance(table, Table):
         raise TypeError(
@@ -63,6 +71,9 @@ def write_table_to_worksheet(table, worksheet, header_format):
                 try:
                     if isinstance(cell, LinkedCell):
                         worksheet.write_url(rn, col, cell.url, string=str(val))
+                    elif (isinstance(val, datetime.date) and
+                          not isinstance(val, datetime.datetime)):
+                        worksheet.write_datetime(rn, col, val, date_format)
                     else:
                         worksheet.write(rn, col, val)
                 except TypeError:

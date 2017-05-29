@@ -13,10 +13,18 @@ Excel (.xlsx) exporter for dodotable_.
 Changelog
 ---------
 
-Version 0.1.1
+Version 0.2.0
 ~~~~~~~~~~~~~
 
 To be released.
+
+- ``datetime.date`` values became properly formatted to ``yyyy-mm-dd``.
+
+  - ``dodotable_xlsx.write_table_to_workbook()`` function became to have
+    an optional parameter ``date_format``.
+
+  - ``dodotable_xlsx.write_table_to_worksheet()`` function became to have
+    a required parameter ``date_format``.
 
 
 Version 0.1.0
