@@ -7,7 +7,7 @@ from xlsxwriter import Workbook
 from xlsxwriter.format import Format
 from xlsxwriter.worksheet import Worksheet
 
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 __all__ = 'write_table_to_workbook', 'write_table_to_worksheet'
 
 
