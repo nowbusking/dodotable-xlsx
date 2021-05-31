@@ -13,10 +13,16 @@ Excel (.xlsx) exporter for dodotable_.
 Changelog
 ---------
 
-Version 0.3.1
+Version 0.4.0
 ~~~~~~~~~~~~~
 
-To be released.
+Released on May 31, 2021.
+
+- Added feature to write to multiple sheet in a file when write table with
+  more than 1000000 row using ``dodotable_xlsx.write_table_to_workbook()``.
+
+  - ``dodotable_xlsx.write_table_to_worksheet()`` function became to have
+    optional parameters ``offset`` and ``row_limit``.
 
 
 Version 0.3.0
