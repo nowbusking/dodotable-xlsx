@@ -13,6 +13,16 @@ Excel (.xlsx) exporter for dodotable_.
 Changelog
 ---------
 
+Version 0.4.1
+~~~~~~~~~~~~~
+
+Released on May 31, 2021.
+
+- Fixed a bug that ``dodotable_xlsx.write_table_to_workbook()`` function had
+  raised ``UnicodeEncodeError`` in python2 when the given ``table``'s label is
+  unicode string.
+
+
 Version 0.4.0
 ~~~~~~~~~~~~~
 
