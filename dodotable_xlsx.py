@@ -11,10 +11,17 @@ __version__ = '0.3.1'
 __all__ = 'write_table_to_workbook', 'write_table_to_worksheet'
 
 
-def write_table_to_workbook(table, workbook,
-                            header_format=None,
-                            date_format=None,
-                            chunk_size=None):
+# xslx file format supports maximum 1048576 rows per sheet
+ROW_LIMIT_PER_SHEET = 1000000
+
+
+def write_table_to_workbook(
+    table,
+    workbook,
+    header_format=None,
+    date_format=None,
+    chunk_size=None,
+):
     if not isinstance(table, Table):
         raise TypeError(
             'table must be an instance of {0.__module__}.{0.__name__} or its '
@@ -23,7 +30,6 @@ def write_table_to_workbook(table, workbook,
     elif not isinstance(workbook, Workbook):
         raise TypeError('workbook must be an instance of {0.__module__}.'
                         '{0.__name__}, not {1!r}'.format(Workbook, workbook))
-    worksheet = workbook.add_worksheet(table.label)
     if header_format is None:
         header_format = workbook.add_format({
             'bold': True,
@@ -32,15 +38,34 @@ def write_table_to_workbook(table, workbook,
         })
     if date_format is None:
         date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
-    write_table_to_worksheet(table, worksheet,
-                             header_format=header_format,
-                             date_format=date_format, chunk_size=chunk_size)
+    count = table.count
+    offset = 0
+    sheet_number = 1
+    while offset < count:
+        worksheet = workbook.add_worksheet('{}_{}'.format(table.label, sheet_number))
+        write_table_to_worksheet(
+            table,
+            worksheet,
+            header_format=header_format,
+            date_format=date_format,
+            chunk_size=chunk_size,
+            offset=offset,
+            row_limit=ROW_LIMIT_PER_SHEET,
+        )
+
+        offset += ROW_LIMIT_PER_SHEET
+        sheet_number += 1
 
 
-def write_table_to_worksheet(table, worksheet,
-                             header_format,
-                             date_format,
-                             chunk_size):
+def write_table_to_worksheet(
+    table,
+    worksheet,
+    header_format,
+    date_format,
+    chunk_size,
+    offset=None,
+    row_limit=None,
+):
     logger = logging.getLogger(__name__ + '.write_table_to_worksheet')
     if not isinstance(table, Table):
         raise TypeError(
@@ -60,21 +85,31 @@ def write_table_to_worksheet(table, worksheet,
         logger.debug('Column #%d: %s', col, column.label)
     logger.debug('%s', table.query)
 
-    count = table.count
-    offset = 0
-    if chunk_size is None:
-        # rows may become more
-        chunk_size = count + 100
+    if offset is None:
+        offset = 0
 
-    rn = 0
-    while offset <= count:
+    if row_limit is None:
+        # rows may become more
+        row_limit = table.count - offset + 100
+
+    if chunk_size is None:
+        chunk_size = row_limit
+
+    offset_end = offset + row_limit
+
+    row_number = 0
+    while offset < offset_end:
+        if row_number >= row_limit:
+            break
         table.select(offset=offset, limit=chunk_size)
         logger.debug('Fetch from %d to %d', offset, chunk_size)
         offset += chunk_size
 
         for row in table.rows:
-            rn += 1
-            logger.debug('Row number: %d', rn)
+            if row_number >= row_limit:
+                break;
+            row_number += 1
+            logger.debug('Row number: %d', row_number)
             for col, cell in enumerate(row):
                 val = cell.data
                 for mode in 'without_render', 'with_render':
@@ -84,13 +119,13 @@ def write_table_to_worksheet(table, worksheet,
                     # rendered by dodotable prior to be passed to XlsxWriter.
                     try:
                         if isinstance(cell, LinkedCell):
-                            worksheet.write_url(rn, col, cell.url,
+                            worksheet.write_url(row_number, col, cell.url,
                                                 string=str(val))
                         elif (isinstance(val, datetime.date) and
                               not isinstance(val, datetime.datetime)):
-                            worksheet.write_datetime(rn, col, val, date_format)
+                            worksheet.write_datetime(row_number, col, val, date_format)
                         else:
-                            worksheet.write(rn, col, val)
+                            worksheet.write(row_number, col, val)
                     except TypeError:
                         if mode == 'without_render':
                             val = cell.repr(val)
