@@ -7,7 +7,7 @@ from xlsxwriter import Workbook
 from xlsxwriter.format import Format
 from xlsxwriter.worksheet import Worksheet
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 __all__ = 'write_table_to_workbook', 'write_table_to_worksheet'
 
 
@@ -42,7 +42,7 @@ def write_table_to_workbook(
     offset = 0
     sheet_number = 1
     while offset < count:
-        worksheet = workbook.add_worksheet('{}_{}'.format(table.label, sheet_number))
+        worksheet = workbook.add_worksheet(u'{}_{}'.format(table.label, sheet_number))
         write_table_to_worksheet(
             table,
             worksheet,
